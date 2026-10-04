@@ -90,7 +90,7 @@ h3{font-size:1.05rem;font-weight:500;letter-spacing:-.015em}
 
 /* Cartões etéreos */
 .hero{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:16px}
-.hero.two{grid-template-columns:1.35fr 1fr}
+.hero.two{grid-template-columns:1.35fr 1fr;align-items:start}
 .hero>*,.grid2>*{min-width:0}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
 .glow{position:relative;overflow:hidden;border-radius:var(--r-xl);padding:22px 24px;min-height:270px;display:flex;flex-direction:column;isolation:isolate;color:#fff}
@@ -396,14 +396,20 @@ const SCHEMA={
     {k:'motivo',l:'Motivo',t:'text',full:1},
     {k:'conduta',l:'Conduta / orientações',t:'textarea',full:1}]},
   ficha:{title:'',noun:'ficha',fields:[
+    {k:'nascimento',l:'Data de nascimento',t:'date'},
     {k:'tipo_sanguineo',l:'Tipo sanguíneo',t:'text'},
     {k:'altura',l:'Altura (cm)',t:'number'},
+    {k:'antropometria',l:'Peso e metas',t:'textarea',full:1},
     {k:'alergias',l:'Alergias e intolerâncias',t:'textarea',full:1},
     {k:'condicoes',l:'Condições de saúde',t:'textarea',full:1},
     {k:'medicacoes',l:'Medicações contínuas',t:'textarea',full:1},
     {k:'cirurgias',l:'Cirurgias e internações',t:'textarea',full:1},
     {k:'familia',l:'Histórico familiar',t:'textarea',full:1},
-    {k:'vacinas',l:'Vacinas',t:'textarea',full:1}]},
+    {k:'ginecologico',l:'Saúde ginecológica',t:'textarea',full:1},
+    {k:'atividade',l:'Atividade física',t:'textarea',full:1},
+    {k:'alimentacao',l:'Alimentação e horários',t:'textarea',full:1},
+    {k:'vacinas',l:'Vacinas',t:'textarea',full:1},
+    {k:'notas',l:'Objetivos e pontos de atenção',t:'textarea',full:1}]},
   viagens:{title:'destino',noun:'viagem',fields:[
     {k:'destino',l:'Destino',t:'text',req:1,full:1},
     {k:'status',l:'Status',t:'select',o:['Ideia','Planejando','Confirmada','Concluída']},
@@ -928,7 +934,7 @@ function viewSaude(){
   const rng=e=>{if(!has(e.ref_min)||!has(e.ref_max))return'';const lo=+e.ref_min,hi=+e.ref_max,span=hi-lo||1,mn=lo-span*.5,mx=hi+span*.5;const pos=v=>Math.max(0,Math.min(100,(v-mn)/(mx-mn)*100));const s=statusOf(e)[0];return `<div class="rng"><div class="okz" style="left:${pos(lo)}%;width:${pos(hi)-pos(lo)}%"></div><div class="dot" style="left:${pos(+e.valor)}%;background:${s==='ok'?'var(--leaf)':'var(--orange)'}"></div></div>`};
   const t=today(); const upcoming=S.data.consultas.filter(c=>c.retorno&&c.retorno>=t).sort((a,b)=>a.retorno<b.retorno?-1:1);
   const cons=S.data.consultas.slice().sort((a,b)=>a.data<b.data?1:-1);
-  const fichaRows=SCHEMA.ficha.fields.filter(f=>ficha[f.k]).map(f=>`<dt>${f.l}</dt><dd>${esc(ficha[f.k])}</dd>`).join('');
+  const fichaRows=SCHEMA.ficha.fields.filter(f=>ficha[f.k]).map(f=>`<dt>${f.l}</dt><dd>${f.t==='date'?fmtD(ficha[f.k]):esc(ficha[f.k])}${f.k==='altura'?' cm':''}</dd>`).join('');
   const nr=upcoming[0];
   const exRows=names.map(n=>{const g=groups[n];const e=g[g.length-1];const s=statusOf(e);const prev=g[g.length-2];const delta=prev?(+e.valor-+prev.valor):null;
     return `<div class="exrow" tabindex="0" data-exsel="${esc(n)}"><div style="min-width:0"><b style="font-weight:500">${esc(n)}</b>${exPill(e)}<div class="muted tiny">${fmtD(e.data)}${e.laboratorio?' · '+esc(e.laboratorio):''}</div></div>
@@ -1143,7 +1149,8 @@ async function runImport(){
       toast(`${Object.keys(rows).length} dias importados`);
     }else{
       const merge=$('#imp-merge')&&$('#imp-merge').checked;const tk=SCHEMA[col].title;let n=0;
-      for(const it of rows){btn.textContent=`Importando ${++n}/${rows.length}…`;const ex=merge?S.data[col].find(x=>norm(x[tk])===norm(it[tk])):null;
+      const key=x=>col==='exames'?norm(x.exame)+'|'+x.data:col==='consultas'?norm(x.especialidade)+'|'+x.data:norm(x[tk]);
+      for(const it of rows){btn.textContent=`Importando ${++n}/${rows.length}…`;const ex=merge?S.data[col].find(x=>key(x)===key(it)):null;
         if(ex){const b={...ex,...it};delete b.id;delete b.exemplo;await save(col,ex.id,b)}else await save(col,uid(),it)}
       toast(`${rows.length} itens importados`);
     }
