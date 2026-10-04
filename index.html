@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#EFEEEB">
-<title>Sistema Pessoal</title>
+<title>a|m dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Instrument+Serif:ital@1&display=swap">
@@ -1044,9 +1044,9 @@ function openForm(col,id,defaults){
   const base=it||defaults||{};
   formCtx={col,id:id||null,existing:!!it};
   const title=col==='ficha'?'Ficha de saúde':(it?`Editar ${sc.noun}`:`Novo ${sc.noun}`);
-  $('#dlgform').innerHTML=`<div class="mh"><h2>${title}</h2><button type="button" class="btn ghost sm" data-close aria-label="Fechar">✕</button></div>
+  $('#dlgform').innerHTML=`<div class="mh"><h2>${title}</h2><button type="button" class="btn sm icon soft" data-close aria-label="Fechar">${ico('x')}</button></div>
    <div class="mb">${sc.fields.map(f=>fieldHTML(col,f,base[f.k])).join('')}</div>
-   <div class="mf"><div>${it&&col!=='ficha'?`<button type="button" class="btn danger" data-del>Excluir</button>`:''}</div><div class="row" style="gap:8px"><button type="button" class="btn" data-close>Cancelar</button><button type="submit" class="btn primary">Salvar</button></div></div>`;
+   <div class="mf"><div>${it&&col!=='ficha'?`<button type="button" class="btn danger" data-del>Excluir</button>`:''}</div><div class="actions"><button type="button" class="btn soft" data-close>Cancelar</button><button type="submit" class="btn dark">Salvar</button></div></div>`;
   const d=$('#dlg'); d.showModal();
 }
 $('#dlgform').addEventListener('submit',async e=>{
@@ -1076,12 +1076,12 @@ $('#dlgform').addEventListener('click',async e=>{
 function openImport(col){
   formCtx={import:true,col,rows:null};
   const isD=col==='diario';
-  $('#dlgform').innerHTML=`<div class="mh"><h2>Importar planilha</h2><button type="button" class="btn ghost sm" data-close aria-label="Fechar">✕</button></div>
+  $('#dlgform').innerHTML=`<div class="mh"><h2>Importar planilha</h2><button type="button" class="btn sm icon soft" data-close aria-label="Fechar">${ico('x')}</button></div>
   <div class="mb"><div class="field full"><label for="imp-file">Arquivo .xlsx ou .csv</label><input type="file" id="imp-file" accept=".csv,.xlsx,.xls"></div>
   <p class="muted small full">${isD?'Formato do seu diário: blocos semanais com as datas na primeira linha, os dias da semana na segunda e uma linha por refeição. Dias já registrados são atualizados com o que estiver preenchido no arquivo.':'A primeira linha precisa ter os nomes das colunas. Colunas reconhecidas: '+SCHEMA[col].fields.map(f=>f.l).join(', ')+'. Validades como “VAL FEV/2027”, “01/2027” ou “12M” são lidas automaticamente.'}</p>
   ${isD?'':`<label class="check full"><input type="checkbox" id="imp-merge" checked> Atualizar itens que já existem com o mesmo nome</label>`}
   <div id="imp-prev" class="full small"></div></div>
-  <div class="mf"><span></span><div class="row" style="gap:8px"><button type="button" class="btn" data-close>Cancelar</button><button type="submit" class="btn primary" id="imp-go" disabled>Importar</button></div></div>`;
+  <div class="mf"><span></span><div class="actions"><button type="button" class="btn soft" data-close>Cancelar</button><button type="submit" class="btn dark" id="imp-go" disabled>Importar</button></div></div>`;
   $('#dlg').showModal();
   $('#imp-file').addEventListener('change',async ev=>{
     const file=ev.target.files[0]; if(!file)return;
